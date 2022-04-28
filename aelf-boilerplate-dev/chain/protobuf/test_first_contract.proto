@@ -1,0 +1,161 @@
+/* This files is part of the Hello World smart contract example that is included in Boilerplate.
+ * It is only the definition of the contract, implementation is located in the "contract" folder
+ * and tests are located in the "test" folder.
+ *
+ * You can use this as a basic template for new contracts.
+ * 
+ * When building Boilerplate or the contract project located in the "../contract/AElf.Contracts.TestFirstContract/" 
+ * protoc (the protobuf compiler) will be invoked and this file will produce a .c.cs file and .g.cs file, in the 
+ * "../contract/AElf.Contracts.TestFirstContract/Protobuf/Generated/" folder. 
+ */
+
+// the version of the language, use proto3 for contracts
+syntax = "proto3";
+
+// some core imports for aelf chain types
+import "aelf/core.proto";
+import "aelf/options.proto";
+import "google/protobuf/timestamp.proto";
+
+// import for using the google.protobuf.Empty type.
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+// the name of the C# namespace in which the contract code will be,
+// generated code will also be in this namespace.
+option csharp_namespace = "AElf.Contracts.TestFirstContract";
+
+// the contract definition: a gRPC service definition.
+service TestFirstContract {
+
+    // the full name of the C# class that will contain the state (here <namespace>.<state-class-name> format).
+    option (aelf.csharp_state) = "AElf.Contracts.TestFirstContract.TestFirstContractState";
+
+    // an action defined as a gRPC service method.
+    // this action take a google.protobuf.Empty (placeholder for void) as input
+    // and returns a custom defined type: HelloReturn.
+    rpc Hello (google.protobuf.Empty) returns (HelloReturn) { }
+    
+    // testhello
+    rpc TestHello(HelloReturn) returns (HelloReturn) {}
+    
+    
+    // 注册普通用户
+    rpc RegisteUser(User) returns (BoolReturn) { }
+    // 注册管理员
+    // 这里可能会有越权的问题
+    rpc RegisteAdmin(Admin) returns (BoolReturn) { }
+    // 普通用户登录
+    rpc LoginUser(PassLogin) returns (BoolReturn) { }
+    // 管理员登录
+    rpc LoginAdmin(PassLogin) returns (BoolReturn) { }
+    // 普通用户请求入链,实质上是加入的待处理的链
+    rpc AddProject(Project)  returns (BoolReturn) { }
+    // 管理员进行处理
+    rpc HandleProject(HandleProjectListId) returns (BoolReturn) { }
+    // 获得userlist
+    rpc GetUserList(google.protobuf.Empty) returns (UserList) { }
+    // 获得adminList
+    rpc GetAadminList(google.protobuf.Empty) returns (AadminList) { }
+    // 获得已入链projectLsit
+    rpc GetAddedProjectList(google.protobuf.Empty) returns (AddedProjectList) { }
+    // 获得待处理projectList
+    rpc GetWaitProjectList(google.protobuf.Empty) returns (WaitAddProjectList) { }
+    
+    rpc Setuserid(google.protobuf.Empty) returns (google.protobuf.Empty) { }
+    
+    
+    
+    // views 
+    rpc Getuserid(google.protobuf.Empty) returns (google.protobuf.Int32Value){
+        option(aelf.is_view) = true;
+    }
+    
+    
+}
+
+// a custom message, used as the return type of the Hello action
+message HelloReturn {
+    string Value = 1;
+}
+
+// 作品
+message Project{
+    int32 Id = 1;   // 作品id
+    string Name = 2;    // 作品名称
+    string RegsiterName = 3; // 注册人名称
+    int32 Type = 4; //作品类型   1:视频  2:音乐 3.文档
+    google.protobuf.Timestamp RegisteTime = 5;  // 作品注册时间
+    string company = 6; // 作品注册人所在单位
+    string status = 7;  //未通过审核、正在审核、已通过审核   
+}
+
+// 登录时候传递的用户名和密码
+message PassLogin{
+    string Name = 1;
+    string pass = 2;
+}
+
+// 普通用户
+message User{
+    int32 Id = 1;   //用户ID
+    string Name = 2;  // 用户名
+    string pass = 3;  //用户密码
+    google.protobuf.Timestamp RegisterTime = 4; //注册时间
+    string Telephone = 5; //联系方式
+    string Mail = 6;    //邮箱
+    repeated Project ProjectList = 7; //作品集
+}
+
+// 管理员
+// 管理员就不做太多限定了直接就能够登陆后台
+message Admin{
+    int32 Id = 1;  // 管理员ID
+    string Name = 2; //管理员用户名
+    string pass = 3; // 管理员密码
+}
+
+// 维护一个普通用户列表
+message UserList{
+    repeated User UserList = 1;
+}
+
+// 管理员列表
+message AadminList{
+    repeated Admin AdminList = 1;
+}
+
+// 待入链Projectlist
+message WaitAddProjectList{
+    repeated Project WaitAddProjectList = 1;
+}
+
+// 已入链projectList
+message AddedProjectList{
+    repeated Project AddedProjectList = 1;
+}
+
+// 
+message AddedProjectListId{
+    int32 Id = 1;
+}
+
+// waitprojectlist ID
+message HandleProjectListId{
+    int32 Id = 1;
+}
+
+// 用户userId的全局变量
+message UserId{
+    int32 userid = 1;
+}
+
+// 管理员adminid的全局变量
+message AadminId{
+    int32 adminid = 1;
+}
+
+
+message BoolReturn{
+    bool returnflag = 1;
+}
